@@ -1,0 +1,55 @@
+import tkinter as tk
+import random
+
+class PlinkoGame:
+    def __init__(self, master):
+        self.master = master
+        self.master.title("Plinko Ball Game")
+        self.canvas = tk.Canvas(master, width=400, height=400, bg='blue')
+        self.canvas.pack()
+
+        self.pins = []
+        self.create_board()
+        self.ball_radius = 10
+        self.ball = None
+
+        self.start_button = tk.Button(master, text="Start", command=self.drop_ball)
+        self.start_button.pack()
+
+    def create_board(self):
+        for row in range(7):
+            for col in range(row % 2, 8, 2):
+                x = 20 + col * 50
+                y = 20 + row * 50
+                pin = self.canvas.create_oval(x, y, x + 10, y + 10, fill='white')
+                self.pins.append(pin)
+
+    def drop_ball(self):
+        if self.ball:
+            self.canvas.delete(self.ball)
+        x = 210
+        y = 10
+        self.ball = self.canvas.create_oval(x, y, x + self.ball_radius * 2, y + self.ball_radius * 2, fill='red')
+        self.animate_ball()
+
+    def animate_ball(self):
+        x, y = self.canvas.coords(self.ball)
+        if y < 370:
+            move_x = random.choice([-5, 0, 5])
+            self.canvas.move(self.ball, move_x, 20)
+            self.master.after(100, self.animate_ball)
+        else:
+            self.check_slot(x)
+
+    def check_slot(self, x):
+        slot = int((x - 10) / 50)
+        tk.messagebox.showinfo("Result", f"Ball landed in slot {slot + 1}")
+
+def main():
+    root = tk.Tk()
+    game = PlinkoGame(root)
+    root.mainloop()
+
+if __name__ == "__main__":
+    main()
+  
